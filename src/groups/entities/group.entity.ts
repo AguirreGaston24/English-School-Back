@@ -2,12 +2,15 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
 @Schema({ timestamps: true })
-export class Group  extends Document{
+export class Group extends Document {
   @Prop({ type: String, required: true })
   level: string;
 
   @Prop({ type: String, required: true })
   teacher: string;
+
+  @Prop({ type: String, required: true })
+  group: string
 
   @Prop({ type: Date, required: true })
   start_date: Date;

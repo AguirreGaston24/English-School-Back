@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -35,6 +35,7 @@ export class GroupsService {
   }
 
   async findOne(id: string): Promise<Group> {
+    if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
     try {
       const group = await this.groupModel.findById(id).exec();
       if (!group) {
@@ -47,6 +48,7 @@ export class GroupsService {
   }
 
   async update(id: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
+    if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
     try {
       const data = await this.groupModel.findByIdAndUpdate(id, updateGroupDto, { new: true }).exec();
       if (!data) {
@@ -59,6 +61,7 @@ export class GroupsService {
   }
 
   async remove(id: string): Promise<Group> {
+    if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
     try {
       const deletedgroup = await this.groupModel.findByIdAndDelete(id).exec();
       if (!deletedgroup) {
