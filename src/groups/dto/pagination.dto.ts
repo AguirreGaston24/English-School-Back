@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsNumber, Min } from 'class-validator';
+import { IsOptional, IsString } from "class-validator";
 
-export class PaginationStudentDto {
+export class PaginationGroupDto {
   @IsOptional()
   page?: number = 1;
 
@@ -17,14 +17,9 @@ export class PaginationStudentDto {
 
   @IsOptional()
   @IsString()
-  term?: string;
+  level?: string;
 
   @IsOptional()
   @IsString()
-  district?: string;
-
-
-  @IsOptional()
-  @IsString()
-  group?: string;
+  teacher?: string;
 }

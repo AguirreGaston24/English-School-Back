@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsNumber, Min } from 'class-validator';
+import { IsOptional, IsString } from "class-validator";
 
-export class PaginationStudentDto {
+export class PaginationTeacherDto {
   @IsOptional()
   page?: number = 1;
 

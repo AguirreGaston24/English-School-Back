@@ -29,53 +29,97 @@ export class StudentService {
   }
 
   async findAll(paginationStudent: PaginationStudentDto) {
+    const {
+      page = 1,
+      limit = 10,
+      order = 'desc',
+      sortBy = 'createdAt',
+      term,
+      district,
+      group,
+    } = paginationStudent;
+
+    const skip = (page - 1) * limit;
+
+    interface FilterProps {
+      group?: string;
+      district?: string;
+    }
+
+    let condition = {}
+    const filter: FilterProps = {};
+
+    if (term) {
+      condition = {
+        $or: [
+          { firstname: { $regex: term, $options: 'i' } },
+          { lastname: { $regex: term, $options: 'i' } },
+          { email: { $regex: term, $options: 'i' } },
+          { phone: { $regex: term, $options: 'i' } },
+          { country: { $regex: term, $options: 'i' } },
+          { city: { $regex: term, $options: 'i' } },
+          { address: { $regex: term, $options: 'i' } },
+          { district: { $regex: term, $options: 'i' } },
+          { dni: { $regex: term, $options: 'i' } },
+          { school: { $regex: term, $options: 'i' } },
+          { group: { $regex: term, $options: 'i' } },
+          { teacher: { $regex: term, $options: 'i' } },
+          { tutor: { $regex: term, $options: 'i' } },
+          { tutor_occupation: { $regex: term, $options: 'i' } },
+          { tutor_phone: { $regex: term, $options: 'i' } },
+          { tutor_address: { $regex: term, $options: 'i' } },
+          { tutor_district: { $regex: term, $options: 'i' } },
+        ],
+      };
+    }
+
+    if (district) {
+      filter.district = district;
+    }
+
+    if (group) {
+      filter.group = group;
+    }
+
+    const sort: any = {};
+    sort[sortBy] = order === 'desc' ? -1 : 1;
+
     try {
-      const { page, limit, order, sortBy, term } = paginationStudent;
-      const sortOrder = order === 'asc' ? 1 : -1;
-      const skip = (page - 1) * limit;
-      let searchConditions = {};
+      const data = await this.studentModel
+        .find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .exec();
 
-      if (term) {
-        searchConditions = {
-          $or: [
-            { firstname: { $regex: term, $options: 'i' } },
-            { lastname: { $regex: term, $options: 'i' } },
-            { email: { $regex: term, $options: 'i' } },
-            { phone: { $regex: term, $options: 'i' } },
-            { country: { $regex: term, $options: 'i' } },
-            { city: { $regex: term, $options: 'i' } },
-            { address: { $regex: term, $options: 'i' } },
-            { district: { $regex: term, $options: 'i' } },
-            { dni: { $regex: term, $options: 'i' } },
-            { school: { $regex: term, $options: 'i' } },
-            { group: { $regex: term, $options: 'i' } },
-            { teacher: { $regex: term, $options: 'i' } },
-            { tutor: { $regex: term, $options: 'i' } },
-            { tutor_occupation: { $regex: term, $options: 'i' } },
-            { tutor_phone: { $regex: term, $options: 'i' } },
-            { tutor_address: { $regex: term, $options: 'i' } },
-            { tutor_district: { $regex: term, $options: 'i' } },
-          ],
-        };
-      }
-
-      const data = await this.studentModel.find(searchConditions).skip(skip).limit(limit).sort({ [sortBy]: sortOrder }).exec();
+      const results = await this.studentModel.countDocuments(filter).sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .exec();
       const total = await this.studentModel.countDocuments().exec();
+      // const total = totalFound + (totalInDatabase - totalFound);
+      const lastPage = Math.ceil(total / limit);
+      const nextPage = page + 1 > lastPage ? null : page + 1;
+      const prevPage = page - 1 < 1 ? null : page - 1;
 
       return {
         response: data,
         status: 200,
         metadata: {
-          total,
-          page,
-          limit,
+          count: total,
+          results,
+          current_page: Number(page),
+          next_page: nextPage,
+          prev_page: prevPage,
+          last_page: lastPage,
+          limit: Number(limit),
           total_pages: Math.ceil(total / limit),
         },
-        message: "Exito",
-      }
+        message: 'Success',
+      };
     } catch (error) {
-      console.log(error)
-      return new BadRequestException('Error al traer los alumnos')
+      console.log(error);
+      throw new BadRequestException('Error retrieving students');
     }
   }
 

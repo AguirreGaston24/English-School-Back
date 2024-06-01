@@ -5,6 +5,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Group } from './entities/group.entity';
+import { PaginationGroupDto } from './dto/pagination.dto';
 
 @Injectable()
 export class GroupsService {
@@ -22,13 +23,85 @@ export class GroupsService {
     }
   }
 
-  async findAll() {
+  async findAll(paginationGroupDto: PaginationGroupDto) {
+    const {
+      page = 1,
+      limit = 10,
+      order = 'desc',
+      sortBy = 'createdAt',
+      level,
+      teacher
+    } = paginationGroupDto;
+
+    const skip = (page - 1) * limit;
+
+    interface FilterProps {
+      level?: string;
+      teacher?: string;
+    }
+
+    let condition = {};
+    let filter: FilterProps = {};
+
+    // if (term) {
+    //   condition = {
+    //     $or: [
+    //       { firstname: { $regex: term, $options: 'i' } },
+    //       { lastname: { $regex: term, $options: 'i' } },
+    //       { email: { $regex: term, $options: 'i' } },
+    //       { phone: { $regex: term, $options: 'i' } },
+    //       { city: { $regex: term, $options: 'i' } },
+    //       { address: { $regex: term, $options: 'i' } },
+    //       { district: { $regex: term, $options: 'i' } },
+    //       { dni: { $regex: term, $options: 'i' } },
+    //     ],
+    //   };
+    // }
+
+    if (level) {
+      filter.level = level;
+    }
+
+    if (teacher) {
+      filter.teacher = teacher;
+    }
+
+    const sort: any = {};
+    sort[sortBy] = order === 'desc' ? -1 : 1;
+
     try {
-      const data = await this.groupModel.find().exec();
+      const data = await this.groupModel
+        .find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .exec();
+      const total = await this.groupModel
+        .countDocuments(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .exec();
+      const results = await this.groupModel.countDocuments().exec();
+      const lastPage = Math.ceil(total / limit);
+      const nextPage = page + 1 > lastPage ? null : page + 1;
+      const prevPage = page - 1 < 1 ? null : page - 1;
+
       return {
         response: data,
-        metadata: {}
-      }
+        status: 200,
+        metadata: {
+          count: total,
+          results,
+          current_page: Number(page),
+          next_page: nextPage,
+          prev_page: prevPage,
+          last_page: lastPage,
+          limit: Number(limit),
+          total_pages: Math.ceil(total / limit),
+        },
+        message: 'Success',
+      };
     } catch (error) {
       throw new BadRequestException('Error retrieving groups');
     }

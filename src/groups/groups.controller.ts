@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { PaginationGroupDto } from './dto/pagination.dto';
 
 @Controller('groups')
 export class GroupsController {
-  constructor(private readonly groupsService: GroupsService) {}
+  constructor(private readonly groupsService: GroupsService) { }
 
   @Post()
   create(@Body() createGroupDto: CreateGroupDto) {
@@ -13,8 +14,8 @@ export class GroupsController {
   }
 
   @Get()
-  findAll() {
-    return this.groupsService.findAll();
+  findAll(@Query() query: PaginationGroupDto) {
+    return this.groupsService.findAll(query);
   }
 
   @Get(':id')

@@ -9,7 +9,7 @@ export class Group extends Document {
   @Prop({ type: String, required: true })
   teacher: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   group: string
 
   @Prop({ type: Date, required: true })
