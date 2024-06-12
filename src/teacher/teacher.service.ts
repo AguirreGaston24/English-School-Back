@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -40,13 +40,7 @@ export class TeacherService {
 
     const skip = (page - 1) * limit;
 
-    interface FilterProps {
-      group?: string;
-      district?: string;
-    }
-
-    let condition = {};
-    let filter: FilterProps = {};
+    let condition: FilterQuery<Teacher> = {};
 
     if (term) {
       condition = {
@@ -64,11 +58,11 @@ export class TeacherService {
     }
 
     if (district) {
-      filter.district = district;
+      condition.district = district;
     }
 
     if (group) {
-      filter.group = group;
+      condition.group = group;
     }
 
     const sort: any = {};
@@ -76,13 +70,13 @@ export class TeacherService {
 
     try {
       const data = await this.teacherModel
-        .find(filter)
+        .find(condition)
         .sort(sort)
         .skip(skip)
         .limit(limit)
         .exec();
       const total = await this.teacherModel
-        .countDocuments(filter)
+        .countDocuments(condition)
         .sort(sort)
         .skip(skip)
         .limit(limit)

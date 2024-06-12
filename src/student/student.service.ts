@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
+
 import { PaginationStudentDto } from './dto/pagination-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { Students } from './entities/student.entity';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class StudentService {
@@ -41,16 +42,11 @@ export class StudentService {
 
     const skip = (page - 1) * limit;
 
-    interface FilterProps {
-      group?: string;
-      district?: string;
-    }
 
-    let condition = {}
-    const filter: FilterProps = {};
+    let filter: FilterQuery<Students> = {};
 
     if (term) {
-      condition = {
+      filter = {
         $or: [
           { firstname: { $regex: term, $options: 'i' } },
           { lastname: { $regex: term, $options: 'i' } },
