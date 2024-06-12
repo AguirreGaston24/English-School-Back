@@ -13,11 +13,6 @@ export class StudentController {
     return this.studentService.create(createStudentDto);
   }
 
-  @Get('seed')
-  seed() {
-    return this.studentService.seed();
-  }
-
   @Get()
   findAll(@Query() paginationDto: PaginationStudentDto) {
     return this.studentService.findAll(paginationDto);

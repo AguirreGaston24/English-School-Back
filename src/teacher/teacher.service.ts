@@ -6,7 +6,6 @@ import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { Teacher } from './entities/teacher.entity';
 import { PaginationTeacherDto } from './dto/pagination.dto';
-import { TEACHER_SEED } from './teachers';
 
 @Injectable()
 export class TeacherService {
@@ -82,7 +81,7 @@ export class TeacherService {
         .skip(skip)
         .limit(limit)
         .exec();
-      const results = await this.teacherModel.countDocuments().exec();
+      const results = await this.teacherModel.countDocuments(condition).exec();
       const lastPage = Math.ceil(total / limit);
       const nextPage = page + 1 > lastPage ? null : page + 1;
       const prevPage = page - 1 < 1 ? null : page - 1;
