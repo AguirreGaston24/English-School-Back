@@ -6,6 +6,7 @@ import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { Teacher } from './entities/teacher.entity';
 import { PaginationTeacherDto } from './dto/pagination.dto';
+import { TEACHER_SEED } from './teachers';
 
 @Injectable()
 export class TeacherService {
