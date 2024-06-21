@@ -36,6 +36,7 @@ export class StudentService {
       order = 'desc',
       sortBy = 'createdAt',
       term,
+      teacher,
       district,
       group,
     } = paginationStudent;
@@ -73,6 +74,10 @@ export class StudentService {
       filter.district = district;
     }
 
+    if (teacher) {
+      filter.teacher = teacher;
+    }
+
     if (group) {
       filter.group = group;
     }
@@ -92,7 +97,7 @@ export class StudentService {
         .skip(skip)
         .limit(limit)
         .exec();
-      const total = await this.studentModel.countDocuments().exec();
+      const total = await this.studentModel.countDocuments(filter).exec();
       // const total = totalFound + (totalInDatabase - totalFound);
       const lastPage = Math.ceil(total / limit);
       const nextPage = page + 1 > lastPage ? null : page + 1;

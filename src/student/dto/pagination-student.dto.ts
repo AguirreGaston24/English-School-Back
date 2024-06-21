@@ -21,6 +21,10 @@ export class PaginationStudentDto {
 
   @IsOptional()
   @IsString()
+  teacher?: string;
+
+  @IsOptional()
+  @IsString()
   district?: string;
 
 

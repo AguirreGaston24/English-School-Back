@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { AssistsModule } from './assists/assists.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { GroupsModule } from './groups/groups.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { GroupsModule } from './groups/groups.module';
     StudentModule,
     AssistsModule,
     TeacherModule,
-    GroupsModule
+    GroupsModule,
+    StatsModule
   ],
   controllers: [AppController],
   providers: [AppService],
