@@ -24,6 +24,7 @@ export class StatsService {
     const students = await this.studentsModel.countDocuments();
     const teachers = await this.teacherModel.countDocuments();
     const total_groups = await this.groupsModel.countDocuments();
+
     const districs = await this.studentsModel.aggregate([
       {
         $group: {
@@ -106,6 +107,26 @@ export class StatsService {
       }
     ]);
 
+    const students_in_teacher = await this.studentsModel.aggregate([
+      {
+        $group: {
+          _id: {
+            teacher: '$teacher',
+            group: '$group',
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          teacher: '$_id.teacher',
+          group: '$_id.group',
+          count: 1,
+          _id: 0
+        }
+      }
+    ]);
+
     return {
       districs,
       daysUntilBirthday,
@@ -113,7 +134,8 @@ export class StatsService {
       students,
       status: 200,
       teachers,
-      total_groups  
+      total_groups, 
+      students_in_teacher
     }
   }
 
