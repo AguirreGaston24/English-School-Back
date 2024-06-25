@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId } from 'mongoose';
+import { FilterQuery, Model, isValidObjectId } from 'mongoose';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -35,28 +35,8 @@ export class GroupsService {
 
     const skip = (page - 1) * limit;
 
-    interface FilterProps {
-      level?: string;
-      teacher?: string;
-    }
 
-    let condition = {};
-    let filter: FilterProps = {};
-
-    // if (term) {
-    //   condition = {
-    //     $or: [
-    //       { firstname: { $regex: term, $options: 'i' } },
-    //       { lastname: { $regex: term, $options: 'i' } },
-    //       { email: { $regex: term, $options: 'i' } },
-    //       { phone: { $regex: term, $options: 'i' } },
-    //       { city: { $regex: term, $options: 'i' } },
-    //       { address: { $regex: term, $options: 'i' } },
-    //       { district: { $regex: term, $options: 'i' } },
-    //       { dni: { $regex: term, $options: 'i' } },
-    //     ],
-    //   };
-    // }
+    let filter: FilterQuery<Group> = {}
 
     if (level) {
       filter.level = level;
@@ -82,7 +62,7 @@ export class GroupsService {
         .skip(skip)
         .limit(limit)
         .exec();
-      const results = await this.groupModel.countDocuments().exec();
+      const results = await this.groupModel.countDocuments(filter).exec();
       const lastPage = Math.ceil(total / limit);
       const nextPage = page + 1 > lastPage ? null : page + 1;
       const prevPage = page - 1 < 1 ? null : page - 1;
