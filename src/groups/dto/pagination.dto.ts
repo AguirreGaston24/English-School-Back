@@ -14,6 +14,10 @@ export class PaginationGroupDto {
   @IsOptional()
   @IsString()
   sortBy?: string = 'createdAt';
+  
+  @IsOptional()
+  @IsString()
+  group: string
 
   @IsOptional()
   @IsString()

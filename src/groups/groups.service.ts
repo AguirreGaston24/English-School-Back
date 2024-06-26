@@ -30,6 +30,7 @@ export class GroupsService {
       order = 'desc',
       sortBy = 'createdAt',
       level,
+      group,
       teacher
     } = paginationGroupDto;
 
@@ -41,7 +42,9 @@ export class GroupsService {
     if (level) {
       filter.level = level;
     }
-
+    if (group) {
+      filter.group = group;
+    }
     if (teacher) {
       filter.teacher = teacher;
     }
