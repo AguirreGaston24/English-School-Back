@@ -10,6 +10,7 @@ import { AssistsModule } from './assists/assists.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { GroupsModule } from './groups/groups.module';
 import { StatsModule } from './stats/stats.module';
+import { BillingModule } from './billing/billing.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { StatsModule } from './stats/stats.module';
     AssistsModule,
     TeacherModule,
     GroupsModule,
-    StatsModule
+    StatsModule,
+    BillingModule
   ],
   controllers: [AppController],
   providers: [AppService],
