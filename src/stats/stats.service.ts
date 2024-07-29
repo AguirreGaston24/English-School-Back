@@ -7,12 +7,14 @@ import { CreateStatDto } from './dto/create-stat.dto';
 import { UpdateStatDto } from './dto/update-stat.dto';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Group } from 'src/groups/entities/group.entity';
+import { Billing } from 'src/billing/entities/billing.entity';
 
 @Injectable()
 export class StatsService {
   constructor(
     @InjectModel(Students.name) private studentsModel: Model<Students>,
     @InjectModel(Teacher.name) private teacherModel: Model<Teacher>,
+    @InjectModel(Billing.name) private billingModel: Model<Billing>,
     @InjectModel(Group.name) private groupsModel: Model<Group>,
   ) { }
 
@@ -127,6 +129,8 @@ export class StatsService {
       }
     ]);
 
+    const billing_students = await this.billingModel.find({ pay_month: true }).countDocuments()
+
     return {
       districs,
       daysUntilBirthday,
@@ -134,8 +138,9 @@ export class StatsService {
       students,
       status: 200,
       teachers,
-      total_groups, 
-      students_in_teacher
+      total_groups,
+      students_in_teacher,
+      billing_students
     }
   }
 
