@@ -1,0 +1,26 @@
+services:
+   app:
+    container_name: app1
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongo_database
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+
+   mongo_database:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_DATABASE: isjc-docker
+    volumes:
+      - ./mongo:/data/db
