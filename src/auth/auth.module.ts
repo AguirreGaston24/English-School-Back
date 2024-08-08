@@ -8,7 +8,7 @@ import { User, UserSchema } from './entities/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
+import { envs } from 'src/config/envs';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
       inject: [ConfigService],
       useFactory: () => {
         return {
-          secret: process.env.JWT_SECRET,
+          secret: envs.JWT_SECRET,
           signOptions: {
             expiresIn: '30d'
           }

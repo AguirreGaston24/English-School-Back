@@ -11,11 +11,12 @@ import { TeacherModule } from './teacher/teacher.module';
 import { GroupsModule } from './groups/groups.module';
 import { StatsModule } from './stats/stats.module';
 import { BillingModule } from './billing/billing.module';
+import { envs } from './config/envs';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGODB_URI),
+    MongooseModule.forRoot(envs.DATABASE_URL),
     AuthModule,
     StudentModule,
     AssistsModule,
