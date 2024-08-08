@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
-@Schema()
+@Schema({ timestamps: true })
 export class Students extends Document {
   @Prop() firstname: string;
   @Prop() lastname: string;
