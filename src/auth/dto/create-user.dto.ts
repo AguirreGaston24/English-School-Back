@@ -16,6 +16,6 @@ export class CreateUserDto {
   @IsString({ message: 'El nombre de usuario debe ser una cadena de caracteres' })
   username: string;
 
-  @IsString({ message: 'El número de teléfono debe ser una cadena de caracteres' })
-  phone: string;
+  // @IsString({ message: 'El número de teléfono debe ser una cadena de caracteres' })
+  // phone: string;
 }
