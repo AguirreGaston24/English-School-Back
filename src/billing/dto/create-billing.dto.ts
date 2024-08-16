@@ -1,20 +1,19 @@
-import { IsBoolean, IsDateString, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsOptional, IsString } from "class-validator";
 
 export class CreateBillingDto {
   @IsString()
   studentId: string;
 
-  @IsNumber()
-  year: number;
-
   @IsBoolean()
+  @IsOptional()
   pay_month: boolean;
 
   @IsBoolean()
+  @IsOptional()
   deuda_month: boolean;
 
-  @IsNumber()
-  receiptNumber: number;
+  @IsString()
+  receiptNumber: string;
 
   @IsString()
   month: string;
@@ -22,15 +21,9 @@ export class CreateBillingDto {
   @IsString()
   scholarshipType: string;
 
-  @IsNumber()
-  amount: number;
-
-  @IsNumber()
-  feeAmount: number;
-
-  @IsDateString()
-  paymentDate: Date;
+  @IsString()
+  amount: string;
 
   @IsString()
-  description: string;
+  feeAmount: string;
 }

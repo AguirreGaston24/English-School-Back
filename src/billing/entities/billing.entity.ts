@@ -1,13 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Billing extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Students', required: true })
   studentId: Types.ObjectId;
-
-  @Prop({ required: true })
-  year: number;  // e.g., 2024
 
   @Prop({ default: false })
   pay_month: boolean;
@@ -29,9 +26,6 @@ export class Billing extends Document {
 
   @Prop({ required: true })
   feeAmount: number;
-
-  @Prop({ required: true })
-  paymentDate: Date;
 }
 
 export const BillingSchema = SchemaFactory.createForClass(Billing);
