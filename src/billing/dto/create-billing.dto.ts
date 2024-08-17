@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateBillingDto {
   @IsString()
@@ -18,8 +18,8 @@ export class CreateBillingDto {
   @IsString()
   month: string;
 
-  @IsString()
-  scholarshipType: string;
+  @IsNumber()
+  scholarshipType: number;
 
   @IsString()
   amount: string;

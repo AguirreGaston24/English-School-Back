@@ -6,7 +6,7 @@ export class Billing extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Students', required: true })
   studentId: Types.ObjectId;
 
-  @Prop({ default: false })
+  @Prop({ default: true })
   pay_month: boolean;
 
   @Prop({ default: false })
