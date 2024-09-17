@@ -11,6 +11,7 @@ import { TeacherModule } from './teacher/teacher.module';
 import { GroupsModule } from './groups/groups.module';
 import { StatsModule } from './stats/stats.module';
 import { BillingModule } from './billing/billing.module';
+import { PaymentModule } from './payment/payment.module';
 import { envs } from './config/envs';
 
 @Module({
@@ -23,7 +24,8 @@ import { envs } from './config/envs';
     TeacherModule,
     GroupsModule,
     StatsModule,
-    BillingModule
+    BillingModule,
+    PaymentModule
   ],
   controllers: [AppController],
   providers: [AppService],
