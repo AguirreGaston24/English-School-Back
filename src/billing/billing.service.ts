@@ -24,7 +24,7 @@ export class BillingService {
 
   async findAll(): Promise<Billing[]> {
     try {
-      return await this.invoiceModel.find().populate('studentId').exec();
+      return await this.invoiceModel.find().populate(['student_id', 'teacher_id']).exec();
     } catch (error) {
       console.log(error)
       throw new InternalServerErrorException('Error retrieving invoices');
@@ -34,10 +34,10 @@ export class BillingService {
   async findOne(id: string) {
     if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
     try {
-      const invoice = await this.invoiceModel.find({ studentId: id }).populate('studentId').exec();
+      const invoice = await this.invoiceModel.find({ student_id: id }).populate(['student_id', 'teacher_id']).exec();
       if (!invoice) {
         throw new NotFoundException(`Invoice with ID ${id} not found`);
-      } 
+      }
       return invoice
     } catch (error) {
       console.log(error)

@@ -2,7 +2,10 @@ import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateBillingDto {
   @IsString()
-  studentId: string;
+  student_id: string;
+
+  @IsString()
+  teacher_id: string;
 
   @IsBoolean()
   @IsOptional()
@@ -13,17 +16,17 @@ export class CreateBillingDto {
   deuda_month: boolean;
 
   @IsString()
-  receiptNumber: string;
+  receipt_number: string;
 
   @IsString()
   month: string;
 
-  @IsNumber()
-  scholarshipType: number;
+  @IsString()
+  fee_type: string;
 
   @IsString()
   amount: string;
 
   @IsString()
-  feeAmount: string;
+  debe_amount: string;
 }
