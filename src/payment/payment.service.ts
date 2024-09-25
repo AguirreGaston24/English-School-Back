@@ -13,28 +13,11 @@ export class PaymentService {
   async findOne(id: string) {
     if (!isValidObjectId(id)) throw new BadRequestException('El id no es un id valido.')
     try {
-      const payments = await this.processTeacherPayments(id);
-
-      // const fullName = payments.teacher?.firstname ? null : `${payments.teacher.firstname} ${payments.teacher.lastname}`
-
-      console.log(payments)
-
-      const groups = Object.keys(payments.groups).map(group => ({
-        group,
-        totalStudents: payments.groups[group].totalStudents,
-        totalAmount: payments.groups[group].totalAmount,
-      }));
-
-      return {
-        payments,
-        totalEarnings: payments.totalEarnings,
-        groups,
-      };
+      return await this.processTeacherPayments(id);
     } catch (error) {
       console.error('Error fetching teacher payment:', error.message);
       throw new BadGatewayException('Error fetching teacher payment.');
     }
-
   }
 
   // Función para calcular el pago de una profesora en específico
@@ -51,14 +34,15 @@ export class PaymentService {
     const teacherPayments = {
       teacher: null,
       totalEarnings: 0,
-      groups: {},
+      groups: {}, // Para acumular datos de cada grupo
+      billings, // Almacenar todos los billing records
     };
 
-    billings.forEach(billing => {
+    billings.forEach((billing) => {
       teacherPayments.teacher = billing.teacher_id;
 
       const student_id = billing.student_id;
-      // @ts-ignore 
+      // @ts-ignore
       const group = student_id.group;
 
       // Inicializar el grupo si no existe
@@ -102,6 +86,18 @@ export class PaymentService {
       teacherPayments.totalEarnings += amountForTeacher;
     });
 
-    return teacherPayments;
+    // Convertir el objeto de grupos en un array
+    const groupArray = Object.keys(teacherPayments.groups).map(groupKey => ({
+      group: groupKey,
+      total_students: teacherPayments.groups[groupKey].totalStudents,
+      total_amount: teacherPayments.groups[groupKey].totalAmount,
+    }));
+
+    return {
+      teacher: teacherPayments.teacher,
+      totalEarnings: teacherPayments.totalEarnings,
+      groups: groupArray, // Ahora es un array de grupos
+      billings: teacherPayments.billings, // Incluye los billings si se necesitan
+    };
   }
 }
