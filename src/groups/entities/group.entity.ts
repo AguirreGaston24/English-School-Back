@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 @Schema({ timestamps: true })
 export class Group extends Document {
   @Prop({ type: String, required: true })
   level: string;
 
-  @Prop({ type: String, required: true })
-  teacher: string;
+  @Prop({ type: Types.ObjectId, ref: 'Teacher', required: true })
+  teacher_id: Types.ObjectId;
 
   @Prop({ type: String, required: true, unique: true })
   group: string

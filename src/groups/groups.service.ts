@@ -58,6 +58,7 @@ export class GroupsService {
         .sort(sort)
         .skip(skip)
         .limit(limit)
+        .populate('teacher_id')
         .exec();
       const total = await this.groupModel
         .countDocuments(filter)
@@ -86,6 +87,7 @@ export class GroupsService {
         message: 'Success',
       };
     } catch (error) {
+      console.log(error)
       throw new BadRequestException('Error retrieving groups');
     }
   }
