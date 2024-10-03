@@ -28,8 +28,8 @@ export class StudentController {
     return this.studentService.update(id, updateStudentDto);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.studentService.remove(id);
-  // }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.studentService.remove(id);
+  }
 }
