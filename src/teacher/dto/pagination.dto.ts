@@ -23,8 +23,19 @@ export class PaginationTeacherDto {
   @IsString()
   district?: string;
 
-
   @IsOptional()
   @IsString()
   group?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string; // Agregado
+
+  @IsOptional()
+  @IsString()
+  firstname?: string; // Agregado
+
+  @IsOptional()
+  @IsString()
+  lastname?: string; // Agregado
 }

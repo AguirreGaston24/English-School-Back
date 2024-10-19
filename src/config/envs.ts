@@ -22,7 +22,7 @@ if (error) throw new Error(`Config validation error: ${error.message}`);
 const ENVS: ENVSPROPS = value;
 
 export const envs = {
-  PORT: ENVS.PORT || 4000,
+  PORT: ENVS.PORT,
   DATABASE_URL: ENVS.DATABASE_URL,
   JWT_SECRET: ENVS.JWT_SECRET,
 };

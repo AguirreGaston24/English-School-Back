@@ -16,10 +16,11 @@ export class GroupsService {
       const data = await this.groupModel.create(createGroupDto);
       return {
         response: data,
-        metadata: {}
-      }
+        status: 201,
+        message: 'Group created successfully',
+      };
     } catch (error) {
-      throw new BadRequestException('Error creating group');
+      throw new BadRequestException(error.message || 'Error creating group');
     }
   }
 
@@ -31,103 +32,86 @@ export class GroupsService {
       sortBy = 'createdAt',
       level,
       group,
-      teacher
+      teacher,
     } = paginationGroupDto;
 
     const skip = (page - 1) * limit;
 
+    const filter: FilterQuery<Group> = {
+      ...(level && { level }),
+      ...(group && { group }),
+      ...(teacher && { teacher }),
+    };
 
-    let filter: FilterQuery<Group> = {}
-
-    if (level) {
-      filter.level = level;
-    }
-    if (group) {
-      filter.group = group;
-    }
-    if (teacher) {
-      filter.teacher = teacher;
-    }
-
-    const sort: any = {};
-    sort[sortBy] = order === 'desc' ? -1 : 1;
+    const sort: Record<string, number> = {
+      [sortBy]: order === 'desc' ? -1 : 1,
+    };
 
     try {
-      const data = await this.groupModel
-        .find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .populate('teacher_id')
-        .exec();
-      const total = await this.groupModel
-        .countDocuments(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .exec();
-      const results = await this.groupModel.countDocuments(filter).exec();
+      const [data, total] = await Promise.all([
+        this.groupModel.find(filter)
+          .sort(sort as any)
+          .skip(skip)
+          .limit(limit)
+          .populate('teacher_id')
+          .populate('students')
+          .exec(),
+        this.groupModel.countDocuments(filter).exec(),
+      ]);
+
       const lastPage = Math.ceil(total / limit);
-      const nextPage = page + 1 > lastPage ? null : page + 1;
-      const prevPage = page - 1 < 1 ? null : page - 1;
+      const nextPage = page < lastPage ? page + 1 : null;
+      const prevPage = page > 1 ? page - 1 : null;
 
       return {
         response: data,
         status: 200,
         metadata: {
           count: total,
-          results,
-          current_page: Number(page),
+          current_page: page,
           next_page: nextPage,
           prev_page: prevPage,
           last_page: lastPage,
-          limit: Number(limit),
-          total_pages: Math.ceil(total / limit),
+          limit,
+          total_pages: lastPage,
         },
         message: 'Success',
       };
     } catch (error) {
-      console.log(error)
-      throw new BadRequestException('Error retrieving groups');
+      throw new BadRequestException(error.message || 'Error retrieving groups');
     }
   }
 
   async findOne(id: string): Promise<Group> {
-    if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
-    try {
-      const group = await this.groupModel.findById(id).exec();
-      if (!group) {
-        throw new NotFoundException(`Group with ID "${id}" not found`);
-      }
-      return group;
-    } catch (error) {
-      throw new BadRequestException('Error retrieving group');
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID');
     }
+    const group = await this.groupModel.findById(id).exec();
+    if (!group) {
+      throw new NotFoundException(`Group with ID "${id}" not found`);
+    }
+    return group;
   }
 
   async update(id: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
-    if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
-    try {
-      const data = await this.groupModel.findByIdAndUpdate(id, updateGroupDto, { new: true }).exec();
-      if (!data) {
-        throw new NotFoundException(`Group with ID "${id}" not found`);
-      }
-      return data;
-    } catch (error) {
-      throw new BadRequestException('Error updating group');
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID');
     }
+    const updatedGroup = await this.groupModel.findByIdAndUpdate(id, updateGroupDto, { new: true }).exec();
+    if (!updatedGroup) {
+      throw new NotFoundException(`Group with ID "${id}" not found`);
+    }
+    return updatedGroup;
   }
 
   async remove(id: string): Promise<Group> {
-    if (!isValidObjectId(id)) throw new BadRequestException('El id no es valido');
-    try {
-      const deletedgroup = await this.groupModel.findByIdAndDelete(id).exec();
-      if (!deletedgroup) {
-        throw new NotFoundException(`Group with ID "${id}" not found`);
-      }
-      return deletedgroup;
-    } catch (error) {
-      throw new BadRequestException('Error deleting group');
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID');
     }
+    const deletedGroup = await this.groupModel.findByIdAndDelete(id).exec();
+    if (!deletedGroup) {
+      throw new NotFoundException(`Group with ID "${id}" not found`);
+    }
+    return deletedGroup;
   }
 }

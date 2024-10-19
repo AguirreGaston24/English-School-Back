@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsOptional, IsString, IsInt, Max } from "class-validator";
 
 export class CreateTeacherDto {
   @IsString() firstname: string;
@@ -11,4 +11,8 @@ export class CreateTeacherDto {
   @IsString() district: string;
   @IsString() dni: string;
   @IsString() birth_date: string;
+  @IsOptional()
+  @IsInt()
+  @Max(100) // Limita el número máximo de elementos por página
+  limit?: number = 10;
 }

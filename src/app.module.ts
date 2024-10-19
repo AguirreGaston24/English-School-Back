@@ -17,7 +17,7 @@ import { envs } from './config/envs';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(envs.DATABASE_URL),
+    MongooseModule.forRoot(envs.DATABASE_URL),   
     AuthModule,
     StudentModule,
     AssistsModule,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, NotFoundException, BadRequestException } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -9,27 +9,69 @@ export class GroupsController {
   constructor(private readonly groupsService: GroupsService) { }
 
   @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.create(createGroupDto);
+  async create(@Body() createGroupDto: CreateGroupDto) {
+    try {
+      const data = await this.groupsService.create(createGroupDto);
+      return {
+        status: 201,
+        message: 'Group created successfully',
+        data,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message); // Cambiar a BadRequestException
+    }
   }
 
   @Get()
-  findAll(@Query() query: PaginationGroupDto) {
-    return this.groupsService.findAll(query);
+  async findAll(@Query() query: PaginationGroupDto) {
+    try {
+      const data = await this.groupsService.findAll(query);
+      return {
+        status: 200,
+        message: 'Groups retrieved successfully',
+        data,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.groupsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.groupsService.findOne(id);
+    if (!data) {
+      throw new NotFoundException(`Group with ID ${id} not found`); // Lanzar NotFoundException si no se encuentra
+    }
+    return {
+      status: 200,
+      message: 'Group retrieved successfully',
+      data,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    return this.groupsService.update(id, updateGroupDto);
+  async update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
+    const data = await this.groupsService.update(id, updateGroupDto);
+    if (!data) {
+      throw new NotFoundException(`Group with ID ${id} not found`); // Lanzar NotFoundException si no se encuentra
+    }
+    return {
+      status: 200,
+      message: 'Group updated successfully',
+      data,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.groupsService.remove(id);
+  async remove(@Param('id') id: string) {
+    const data = await this.groupsService.remove(id);
+    if (!data) {
+      throw new NotFoundException(`Group with ID ${id} not found`); // Lanzar NotFoundException si no se encuentra
+    }
+    return {
+      status: 200,
+      message: 'Group deleted successfully',
+      data,
+    };
   }
 }

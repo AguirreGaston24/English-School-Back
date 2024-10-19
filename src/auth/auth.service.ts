@@ -41,7 +41,7 @@ export class AuthService {
   }
 
   async findAll() {
-    return this.UserModel.find();
+    return this.UserModel.find(); 
   }
 
   async login(loginUserDto: LoginUserDto) {
