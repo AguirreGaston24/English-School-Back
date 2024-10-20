@@ -6,7 +6,7 @@ import { envs } from './config/envs';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: ['*', 'http://localhost:3000', 'https://esi-dashboard-ten.vercel.app'],
+    origin: ['*', 'http://localhost:3000', 'envs.DEPLOY'],
     allowedHeaders: ['Accept', 'Content-Type', 'Authorization'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
