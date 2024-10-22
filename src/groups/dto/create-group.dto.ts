@@ -1,40 +1,41 @@
-import { IsString, IsOptional, IsDateString, IsArray, IsNumber, IsNotEmpty, IsMongoId, IsIn } from 'class-validator';
+import { IsString, IsOptional, IsDateString, IsArray, IsNumber, IsNotEmpty, IsMongoId } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateGroupDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  readonly name: string;
 
   @IsString()
   @IsNotEmpty()
-  level: string;
+  readonly level: string;
 
   @IsString()
   @IsNotEmpty()
-  group: string;
+  readonly group: string;
 
   @IsOptional()
   @IsMongoId()
-  teacher_id?: Types.ObjectId;
+  readonly teacher_id?: Types.ObjectId;
 
   @IsDateString()
-  start_date: string;
+  @IsNotEmpty()
+  readonly start_date: string;
 
   @IsDateString()
-  end_date: string;
+  @IsNotEmpty()
+  readonly end_date: string;
 
   @IsArray()
   @IsNotEmpty()
-  @IsIn(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], { each: true })
-  days: string[];
+  readonly days: string[];
 
   @IsNumber()
   @IsNotEmpty()
-  capacity: number;
+  readonly capacity: number;
 
   @IsArray()
   @IsOptional()
   @IsMongoId({ each: true })
-  students?: Types.ObjectId[];
+  readonly students?: Types.ObjectId[];
 }

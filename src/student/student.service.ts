@@ -4,7 +4,7 @@ import { FilterQuery, Model } from 'mongoose';
 
 import { PaginationStudentDto } from './dto/pagination-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { Students } from './entities/student.entity';
+import { Students } from './entities/student.entity';   
 
 @Injectable()
 export class StudentService {

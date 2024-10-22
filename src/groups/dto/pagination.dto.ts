@@ -1,29 +1,32 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString, IsIn, IsNumber } from 'class-validator';
 
 export class PaginationGroupDto {
   @IsOptional()
-  page?: number = 1;
+  @IsNumber()
+  readonly page?: number = 1;
 
   @IsOptional()
-  limit?: number = 10;
-
-  @IsOptional()
-  @IsString()
-  order?: 'desc' | 'asc' = 'desc';
-
-  @IsOptional()
-  @IsString()
-  sortBy?: string = 'createdAt';
-  
-  @IsOptional()
-  @IsString()
-  group: string
+  @IsNumber()
+  readonly limit?: number = 10;
 
   @IsOptional()
   @IsString()
-  level?: string;
+  @IsIn(['desc', 'asc'])
+  readonly order?: 'desc' | 'asc' = 'desc';
 
   @IsOptional()
   @IsString()
-  teacher?: string;
+  readonly sortBy?: string = 'createdAt';
+
+  @IsOptional()
+  @IsString()
+  readonly group?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly level?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly teacher?: string;
 }

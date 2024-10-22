@@ -2,39 +2,44 @@ import { IsString, IsOptional, IsDateString, IsArray, IsNumber, IsNotEmpty, IsMo
 import { Types } from 'mongoose';
 
 export class UpdateGroupDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  name: string;
+  readonly name?: string;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  level: string;
+  readonly level?: string;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  group: string;
+  readonly group?: string;
 
   @IsOptional()
   @IsMongoId()
-  teacher_id?: Types.ObjectId;
+  readonly teacher_id?: Types.ObjectId;
 
+  @IsOptional()
   @IsDateString()
-  start_date: string;
+  readonly start_date?: string;
 
+  @IsOptional()
   @IsDateString()
-  end_date: string;
+  readonly end_date?: string;
 
+  @IsOptional()
   @IsArray()
-  @IsNotEmpty()
-  @IsIn(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], { each: true })
-  days: string[];
+  readonly days?: string[];
 
+  @IsOptional()
   @IsNumber()
   @IsNotEmpty()
-  capacity: number;
+  readonly capacity?: number;
 
-  @IsArray()
   @IsOptional()
+  @IsArray()
   @IsMongoId({ each: true })
-  students?: Types.ObjectId[];
+  readonly students?: Types.ObjectId[];
 }

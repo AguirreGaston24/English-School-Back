@@ -1,8 +1,9 @@
+// student.entity.ts
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
 @Schema({ timestamps: true })
-export class Students extends Document {
+export class Students extends Document { // Cambiado de Students a Student
   @Prop() firstname: string;
   @Prop() lastname: string;
   @Prop() email: string;
@@ -19,8 +20,9 @@ export class Students extends Document {
   @Prop() tutor_phone: string;
   @Prop() tutor_address: string;
   @Prop() tutor_district: string;
-  @Prop() createdAt: Date;
-  @Prop() updatedAt: Date;
+  // Elimina estos campos si no los necesitas, ya que se generan automáticamente
+  // @Prop() createdAt: Date;
+  // @Prop() updatedAt: Date;
   @Prop() group: string;
   @Prop() level: string;
   @Prop() teacher: string;

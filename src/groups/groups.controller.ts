@@ -6,20 +6,16 @@ import { PaginationGroupDto } from './dto/pagination.dto';
 
 @Controller('groups')
 export class GroupsController {
-  constructor(private readonly groupsService: GroupsService) { }
+  constructor(private readonly groupsService: GroupsService) {}
 
   @Post()
   async create(@Body() createGroupDto: CreateGroupDto) {
-    try {
-      const data = await this.groupsService.create(createGroupDto);
-      return {
-        status: 201,
-        message: 'Group created successfully',
-        data,
-      };
-    } catch (error) {
-      throw new BadRequestException(error.message); // Cambiar a BadRequestException
-    }
+    const data = await this.groupsService.create(createGroupDto);
+    return {
+      status: 201,
+      message: 'Group created successfully',
+      data,
+    };
   }
 
   @Get()
@@ -29,19 +25,16 @@ export class GroupsController {
       return {
         status: 200,
         message: 'Groups retrieved successfully',
-        data,
+        data, // Considera si necesitas más metadatos aquí
       };
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message || 'Error retrieving groups');
     }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.groupsService.findOne(id);
-    if (!data) {
-      throw new NotFoundException(`Group with ID ${id} not found`); // Lanzar NotFoundException si no se encuentra
-    }
     return {
       status: 200,
       message: 'Group retrieved successfully',
@@ -51,23 +44,33 @@ export class GroupsController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    const data = await this.groupsService.update(id, updateGroupDto);
-    if (!data) {
-      throw new NotFoundException(`Group with ID ${id} not found`); // Lanzar NotFoundException si no se encuentra
+    try {
+      const data = await this.groupsService.update(id, updateGroupDto);
+      return {
+        status: 200,
+        message: 'Group updated successfully',
+        data,
+      };
+    } catch (error) {
+      // Manejar errores específicos, dependiendo de la lógica de tu servicio
+      if (error instanceof NotFoundException) {
+        return {
+          status: 404,
+          message: error.message,
+        };
+      }
+      // Puedes manejar otros tipos de errores aquí
+      return {
+        status: 500,
+        message: 'An unexpected error occurred',
+      };
     }
-    return {
-      status: 200,
-      message: 'Group updated successfully',
-      data,
-    };
   }
+  
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const data = await this.groupsService.remove(id);
-    if (!data) {
-      throw new NotFoundException(`Group with ID ${id} not found`); // Lanzar NotFoundException si no se encuentra
-    }
     return {
       status: 200,
       message: 'Group deleted successfully',
