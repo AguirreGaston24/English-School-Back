@@ -1,32 +1,32 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsString, IsNumber, IsPhoneNumber, IsOptional, Min, Matches, IsBoolean } from 'class-validator';
 
 export class CreateBillingDto {
   @IsString()
   student_id: string;
 
-  @IsString()
-  teacher_id: string;
-
-  @IsBoolean()
-  @IsOptional()
-  pay_month: boolean;
-
   @IsBoolean()
   @IsOptional()
   deuda_month: boolean;
 
-  @IsString()
-  receipt_number: string;
+  @IsNumber()
+  receipt_number: number;
 
   @IsString()
   month: string;
 
   @IsString()
-  fee_type: string;
+  beca: string;  // Cambia a número para realizar operaciones aritméticas.
 
   @IsString()
-  amount: string;
+  amount: string;  // Cambia a número para realizar operaciones aritméticas.
+
+  @IsNumber()
+  @IsOptional()  // Lo hacemos opcional porque se calculará automáticamente.
+  debe_amount: number;
 
   @IsString()
-  debe_amount: string;
+  phone: string;
+
+  @IsString()
+  payment_type: string;
 }

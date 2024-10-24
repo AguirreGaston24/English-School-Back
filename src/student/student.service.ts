@@ -124,6 +124,10 @@ export class StudentService {
     }
   }
 
+  async findById(id: string): Promise<Students | null> {
+    return this.studentModel.findById(id).exec();
+  }
+
   async findOne(id: string) {
     try {
       const data = await this.studentModel.findById(id)

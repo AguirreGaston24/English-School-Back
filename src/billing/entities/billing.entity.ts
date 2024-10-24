@@ -1,13 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
-@Schema({ timestamps: true })
+@Schema()
 export class Billing extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'Students', required: true })
-  student_id: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, ref: 'Teacher', required: true })
-  teacher_id: Types.ObjectId;
+  @Prop({ type: String, required: true })
+  student_id: string;
 
   @Prop({ default: true })
   pay_month: boolean;
@@ -22,16 +19,13 @@ export class Billing extends Document {
   month: string;
 
   @Prop({ required: true })
-  fee_type: string;
+  beca: string;
 
   @Prop({ required: true })
   payment_type: string;
 
   @Prop({ required: true })
   amount: number;
-
-  @Prop({ type: Number, default: 0 })
-  amount_to_teacher: number; // Monto que va a recibir la profesora tras el descuento
 
   @Prop({ default: 0 })
   debe_amount: number

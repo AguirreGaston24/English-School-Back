@@ -15,5 +15,6 @@ import { StudentSchema, Students } from './entities/student.entity';
   ],
   controllers: [StudentController],
   providers: [StudentService],
+  exports: [StudentService]
 })
 export class StudentModule { }

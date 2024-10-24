@@ -39,7 +39,7 @@ export class PaymentService {
     };
 
     billings.forEach((billing) => {
-      teacherPayments.teacher = billing.teacher_id;
+      //teacherPayments.teacher = billing.teacher_id;
 
       const student_id = billing.student_id;
       // @ts-ignore
@@ -59,7 +59,7 @@ export class PaymentService {
 
       // Aplicar la tarifa según el tipo de cuota
       let finalAmount = billing.amount;
-      switch (billing.fee_type) {
+      switch (billing.beca) {
         case 'HERMANOS':
           finalAmount = 2000;
           break;
@@ -79,7 +79,7 @@ export class PaymentService {
       const amountForTeacher = finalAmount * 0.25;
 
       // Actualizar el monto a recibir para la profesora en el registro
-      billing.amount_to_teacher = amountForTeacher;
+    //  billing.amount_to_teacher = amountForTeacher;
       billing.save();
 
       // Sumar el total para la profesora

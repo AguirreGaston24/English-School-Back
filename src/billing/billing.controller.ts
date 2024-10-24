@@ -1,3 +1,4 @@
+
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { BillingService } from './billing.service';
 import { CreateBillingDto } from './dto/create-billing.dto';
@@ -28,7 +29,8 @@ export class BillingController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.billingService.remove(id);
+  async remove(@Param('id') id: string){
+    const cleanId = id.trim(); // Elimina espacios en blanco o saltos de línea
+    return this.billingService.remove(cleanId);
   }
 }
