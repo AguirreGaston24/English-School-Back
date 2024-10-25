@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { CreateBillingDto } from './dto/create-billing.dto';
 import { Billing } from './entities/billing.entity';
-import { StudentService } from '../student/student.service'; // Asegúrate de tener este servicio
+import { StudentService } from '../student/student.service'; 
 import { UpdateBillingDto } from './dto/update-billing.dto';
-
+//import { Twilio } from 'twilio';   // Para enviar mensajes SMS
 
 @Injectable()
 export class BillingService {
@@ -13,29 +13,39 @@ export class BillingService {
     @InjectModel(Billing.name) private readonly billingModel: Model<Billing>,
     @InjectModel(Billing.name) private readonly invoiceModel: Model<Billing>,
     private readonly studentsService: StudentService, // Inyección del StudentService
-  ) {}
+  ) {
+    // Inicializa el cliente de Twilio con tus credenciales
+  }
 
   async create(createBillingDto: CreateBillingDto): Promise<Billing> {
     try {
-      // Busca al estudiante por su ID
       const student = await this.studentsService.findById(createBillingDto.student_id);
-
-      // Si no se encuentra el estudiante, arroja una excepción
+  
       if (!student) {
         throw new NotFoundException(`Student with ID ${createBillingDto.student_id} not found`);
       }
       
-
+      // Obtén el siguiente número de recibo
+      const nextReceiptNumber = await this.getNextReceiptNumber();
+  
       // Crea el registro de facturación
       const billingRecord = new this.billingModel({
-        ...createBillingDto,      // Asignamos el resultado calculado
+        ...createBillingDto,
+        receipt_number: nextReceiptNumber, // Asigna el número de recibo
       });
   
-      return await billingRecord.save();
+      const savedBilling = await billingRecord.save();
+  
+      return savedBilling;
     } catch (error) {
-      console.error('Error creating billing record:', error); // Añade este log
+      console.error('Error creating billing record:', error);
       throw new InternalServerErrorException('Error creating billing record');
     }
+  }
+  
+  private async getNextReceiptNumber(): Promise<number> {
+    const lastInvoice = await this.billingModel.findOne().sort({ receipt_number: -1 }).exec();
+    return lastInvoice ? lastInvoice.receipt_number + 1 : 1; // Empieza desde 1 si no hay facturas
   }
 
   async findAll(): Promise<Billing[]> {

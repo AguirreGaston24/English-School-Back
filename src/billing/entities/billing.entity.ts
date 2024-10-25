@@ -12,7 +12,8 @@ export class Billing extends Document {
   @Prop({ default: false })
   deuda_month: boolean;
 
-  @Prop({ required: true })
+  // Corregido: `type: Number` dentro del objeto `@Prop`
+  @Prop({ unique: true })  // Asegura que sea único
   receipt_number: number;
 
   @Prop({ required: true })
@@ -28,7 +29,7 @@ export class Billing extends Document {
   amount: number;
 
   @Prop({ default: 0 })
-  debe_amount: number
+  debe_amount: number;
 }
 
 export const BillingSchema = SchemaFactory.createForClass(Billing);
