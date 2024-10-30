@@ -30,6 +30,19 @@ export class Billing extends Document {
 
   @Prop({ default: 0 })
   debe_amount: number;
+
+  @Prop({ default: 0 })
+  amount_to_pay: number;
+
+  @Prop({default: false})
+  debe:boolean
+
+  @Prop({ required: true })
+  group_id: string; 
+  
+  @Prop({ default: 0 })
+  total_amount: number;
+
 }
 
 export const BillingSchema = SchemaFactory.createForClass(Billing);

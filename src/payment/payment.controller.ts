@@ -1,12 +1,33 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { PaymentService } from './payment.service';
+import { CreatePaymentDto } from './dto/create-payment.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { Payment } from './entities/payment.entity';
+
+
+
 
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(private readonly PaymentService: PaymentService) {}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(id);
+
+  @Get()
+  findAll() { 
+    return this.PaymentService.findAll();
   }
-}
+
+  @Post()
+  async createPayment(@Body() createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    return this.PaymentService.createPayment(createPaymentDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string){
+    const cleanId = id.trim(); // Elimina espacios en blanco o saltos de línea
+    return this.PaymentService.remove(cleanId);
+  }
+
+
+  }
+

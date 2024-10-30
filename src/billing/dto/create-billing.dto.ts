@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsPhoneNumber, IsOptional, Min, Matches, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsPhoneNumber, IsOptional, Min, Matches, IsBoolean, IsNotEmpty } from 'class-validator';
 
 export class CreateBillingDto {
   @IsString()
@@ -8,17 +8,14 @@ export class CreateBillingDto {
   @IsOptional()
   deuda_month: boolean;
 
-  @IsNumber()
-  receipt_number: number;
-
   @IsString()
   month: string;
 
   @IsString()
   beca: string;  // Cambia a número para realizar operaciones aritméticas.
 
-  @IsString()
-  amount: string;  // Cambia a número para realizar operaciones aritméticas.
+  @IsNumber()
+  amount: number;  // Cambia a número para realizar operaciones aritméticas.
 
   @IsNumber()
   @IsOptional()  // Lo hacemos opcional porque se calculará automáticamente.
@@ -29,4 +26,12 @@ export class CreateBillingDto {
 
   @IsString()
   payment_type: string;
+
+  @IsString()
+  amount_to_pay: number;
+
+  @IsNotEmpty()
+  @IsString()
+  group_id: string;
+
 }

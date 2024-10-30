@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+
 
 @Schema({ timestamps: true })
 export class Teacher extends Document {
@@ -32,6 +33,10 @@ export class Teacher extends Document {
 
   @Prop({ type: String, required: true })
   birth_date: string;
+  
+  @Prop({ type: [String] }) // Asegúrate de que sea un arreglo de strings
+  group_names: string[];
+  
 }
 
 export const TeacherSchema = SchemaFactory.createForClass(Teacher);

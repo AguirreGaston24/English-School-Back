@@ -25,6 +25,7 @@ export class Students extends Document { // Cambiado de Students a Student
   // @Prop() updatedAt: Date;
   @Prop() group: string;
   @Prop() level: string;
+  @Prop() teacherId: string
   @Prop() teacher: string;
   @Prop() birth_date: Date;
 }

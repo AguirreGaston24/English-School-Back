@@ -12,5 +12,6 @@ import { StudentModule } from '../student/student.module'; // Asegúrate de impo
   ],
   providers: [BillingService],
   controllers: [BillingController],
+  exports:[BillingService]
 })
 export class BillingModule {}

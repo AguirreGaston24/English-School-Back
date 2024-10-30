@@ -1,103 +1,230 @@
-import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
-import { isValidObjectId, Model } from 'mongoose';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreatePaymentDto } from './dto/create-payment.dto';
+import { Payment } from './entities/payment.entity';
+import { TeacherService } from '../teacher/teacher.service'; 
+import { Group } from '../groups/entities/group.entity';
+import { Teacher } from '../teacher/entities/teacher.entity';
+import { GroupsService } from '../groups/groups.service';
+import { BillingService } from '../billing/billing.service';
+import { Billing } from '../billing/entities/billing.entity';
+import { StudentService } from '../student/student.service';
+import { Students } from '../student/entities/student.entity';
+import { Cron } from '@nestjs/schedule';
 
-import { Billing } from 'src/billing/entities/billing.entity';
+
 
 @Injectable()
 export class PaymentService {
   constructor(
-    @InjectModel(Billing.name) private billingModel: Model<Billing>,
-  ) { }
+    @InjectModel(Payment.name) private readonly invoiceModel: Model<Payment>,
+    private readonly groupsService: GroupsService,
+    private readonly teacherService: TeacherService,
+    private readonly billingService: BillingService,
+    private readonly studentService: StudentService,
+  ) {}
 
-  async findOne(id: string) {
-    if (!isValidObjectId(id)) throw new BadRequestException('El id no es un id valido.')
+  async findAll(): Promise<{ response: Payment[]; status: number; message: string }> {
     try {
-      return await this.processTeacherPayments(id);
+      const payments = await this.invoiceModel.find().exec();
+
+      const status = payments.length > 0 ? 200 : 204;
+      const message = payments.length > 0
+        ? 'Pagos obtenidos con éxito'
+        : 'No se encontraron pagos';
+
+      return {
+        response: payments,
+        status,
+        message,
+      };
     } catch (error) {
-      console.error('Error fetching teacher payment:', error.message);
-      throw new BadGatewayException('Error fetching teacher payment.');
+      console.error('Error al obtener los pagos:', error);
+      throw new InternalServerErrorException('Error al obtener los pagos');
     }
   }
 
-  // Función para calcular el pago de una profesora en específico
-  async processTeacherPayments(teacherId: string) {
-    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 6);
-
-    // Obtener todos los pagos de los alumnos de la profesora entre el 1 y el 6 del mes
-    const billings = await this.billingModel.find({
-      teacher_id: teacherId,
-      // createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-    }).populate(['student_id', 'teacher_id']);
-
-    const teacherPayments = {
-      teacher: null,
-      totalEarnings: 0,
-      groups: {}, // Para acumular datos de cada grupo
-      billings, // Almacenar todos los billing records
+  async getAllGroups(): Promise<{
+    response: {
+      groups: Array<{
+        teacherId: string | null;
+        firstName: string | null;
+        lastName: string | null;
+        dni: string | null;
+        groups: string[];
+        totalAmount: number; // Suma de amounts de billing
+        studentCount: number;
+      }>;
     };
-
-    billings.forEach((billing) => {
-      //teacherPayments.teacher = billing.teacher_id;
-
-      const student_id = billing.student_id;
-      // @ts-ignore
-      const group = student_id.group;
-
-      // Inicializar el grupo si no existe
-      if (!teacherPayments.groups[group]) {
-        teacherPayments.groups[group] = {
-          totalStudents: 0,
-          totalAmount: 0,
-        };
+    status: number;
+    message: string;
+  }> {
+    try {
+      // Llamamos a findAll y asumimos que la respuesta tiene la estructura mencionada
+      const { response: groupsResult } = await this.groupsService.findAll({});
+      
+      // Obtenemos los registros de facturación
+      const billingRecords = await this.billingService.getBillingRecords();
+      
+      const teachersMap: Map<string, {
+        teacherId: string | null;
+        firstName: string | null;
+        lastName: string | null;
+        dni: string | null;
+        groups: string[];
+        totalAmount: number;
+        studentCount: number;
+      }> = new Map();
+      
+      // Primero, sumamos los amounts por group_id
+      const billingSums: Record<string, number> = {};
+      
+      billingRecords.forEach(billing => {
+        const groupId = billing.group_id;
+        const amount = billing.amount;
+  
+        billingSums[groupId] = (billingSums[groupId] || 0) + amount;
+      });
+  
+    // Procesamos los grupos y sumamos el total para cada profesor
+    groupsResult.forEach(group => {
+      const teacher = group.teacher_id;
+      
+      if (teacher) {
+        const teacherId = teacher._id.toString();
+        
+        if (teachersMap.has(teacherId)) {
+          const existingTeacher = teachersMap.get(teacherId);
+          if (existingTeacher) {
+            existingTeacher.groups.push(group.group);
+            existingTeacher.studentCount += group.studentCount || 0;
+            existingTeacher.totalAmount += billingSums[group.group] * 0.25 || 0;
+          }
+        } else {
+          teachersMap.set(teacherId, {
+            teacherId: teacherId,
+            firstName: teacher.firstname,
+            lastName: teacher.lastname,
+            dni: teacher.dni,
+            groups: [group.group],
+            totalAmount: billingSums[group.group] * 0.25 || 0,
+            studentCount: group.studentCount || 0,
+          });
+        }
       }
-
-      // Incrementar el total de estudiantes y el monto total del grupo
-      teacherPayments.groups[group].totalStudents += 1;
-      teacherPayments.groups[group].totalAmount += billing.amount;
-
-      // Aplicar la tarifa según el tipo de cuota
-      let finalAmount = billing.amount;
-      switch (billing.beca) {
-        case 'HERMANOS':
-          finalAmount = 2000;
-          break;
-        case 'PRIMOS':
-          finalAmount = 2200;
-          break;
-        case 'BECA ANUAL':
-          finalAmount = 1500;
-          break;
-        case 'INDIVIDUAL':
-        default:
-          finalAmount = 2500;
-          break;
-      }
-
-      // Aplicar el 25% de pago para la profesora
-      const amountForTeacher = finalAmount * 0.25;
-
-      // Actualizar el monto a recibir para la profesora en el registro
-    //  billing.amount_to_teacher = amountForTeacher;
-      billing.save();
-
-      // Sumar el total para la profesora
-      teacherPayments.totalEarnings += amountForTeacher;
     });
 
-    // Convertir el objeto de grupos en un array
-    const groupArray = Object.keys(teacherPayments.groups).map(groupKey => ({
-      group: groupKey,
-      total_students: teacherPayments.groups[groupKey].totalStudents,
-      total_amount: teacherPayments.groups[groupKey].totalAmount,
-    }));
-
-    return {
-      teacher: teacherPayments.teacher,
-      totalEarnings: teacherPayments.totalEarnings,
-      groups: groupArray, // Ahora es un array de grupos
-      billings: teacherPayments.billings, // Incluye los billings si se necesitan
-    };
+  
+      // Convertimos el mapa a un array
+      const groups = Array.from(teachersMap.values());
+  
+      const status = groups.length > 0 ? 200 : 204;
+  
+      return {
+        response: { groups },
+        status,
+        message: 'Grupos y detalles de profesores obtenidos con éxito',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException('Error al obtener los grupos');
+    }
   }
+  
+  
+  private extractResponseArray(result: any): any[] {
+    return Array.isArray(result.response) ? result.response : [];
+  }
+
+  async createPayment(createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    try {
+      const {
+        teacher_id,
+        firstName,
+        lastName,
+        dni,
+        groupName,
+        amount,
+        month,
+      } = createPaymentDto;
+  
+      const nextReceiptNumber = await this.getNextReceiptNumber();
+  
+      const payment = new this.invoiceModel({
+        teacher_id,
+        firstName,
+        lastName,
+        dni,
+        groupName,
+        amount,
+        month,
+        receipt_number: nextReceiptNumber,
+      });
+  
+      return await payment.save();
+    } catch (error) {
+      console.error('Error al crear el pago:', error);
+      throw new InternalServerErrorException('Error al crear el pago');
+    }
+  }
+  
+  
+
+  private async getNextReceiptNumber(): Promise<number> {
+    const lastInvoice = await this.invoiceModel.findOne().sort({ receipt_number: -1 }).exec();
+    
+    // Imprimir el resultado del último recibo para depuración
+    console.log('Último recibo encontrado:', lastInvoice);
+    
+    // Asegurarte de que el último recibo existe y tiene un número válido
+    if (lastInvoice && typeof lastInvoice.receipt_number === 'number') {
+      return lastInvoice.receipt_number + 1;
+    }
+    
+    // Retornar 1 si no hay facturas
+    return 1;
+  }
+
+ //  @Cron('*/15 * * * * *')
+ @Cron('0 0 7 * *')
+  async processMonthlyPayments() {
+    console.log('Ejecutando tarea de pago automático...');
+    try {
+      const { response: groups } = await this.getAllGroups();
+      const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+  
+      for (const group of groups.groups) {
+        const createPaymentDto: CreatePaymentDto = {
+          teacher_id: group.teacherId,
+          firstName: group.firstName,
+          lastName: group.lastName,
+          dni: group.dni,
+          groupName: group.groups,
+          amount: group.totalAmount,
+          month: currentMonth,
+          studentCount: group.studentCount
+
+        };
+  
+        console.log('Procesando pago automático para el profesor:', createPaymentDto);
+  
+        // Intentamos crear el pago usando el DTO con toda la información
+        await this.createPayment(createPaymentDto);
+      }
+  
+      console.log('Pagos automáticos procesados con éxito.');
+    } catch (error) {
+      console.error('Error al procesar pagos automáticos:', error);
+    }
+  }
+
+  async remove(id: string): Promise<void> {
+    const invoice = await this.invoiceModel.findByIdAndDelete(id);
+    if (!invoice) {
+      throw new NotFoundException(`Invoice with ID ${id} not found`);
+    }
+  }
+  
 }
+

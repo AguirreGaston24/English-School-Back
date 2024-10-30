@@ -5,10 +5,13 @@ import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { PaginationTeacherDto } from './dto/pagination.dto';
 import { IdParamDto } from './dto/id-param.dto'; // Importa el DTO de validación
 import { isValidObjectId } from 'mongoose';
+import { Teacher } from './entities/teacher.entity'; // Importar el tipo Teacher
+
 
 @Controller('teachers')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
+
 
   @Post()
   async create(@Body() createTeacherDto: CreateTeacherDto) {
@@ -21,6 +24,7 @@ export class TeacherController {
 
   @Get()
   async findAll(@Query() query: PaginationTeacherDto) {
+    
     return await this.teacherService.findAll(query);
   }
 

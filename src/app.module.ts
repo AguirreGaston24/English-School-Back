@@ -12,6 +12,7 @@ import { GroupsModule } from './groups/groups.module';
 import { StatsModule } from './stats/stats.module';
 import { BillingModule } from './billing/billing.module';
 import { PaymentModule } from './payment/payment.module';
+import { Shedule } from './payment/ScheduleModule ';
 import { envs } from './config/envs';
 
 @Module({
@@ -25,7 +26,8 @@ import { envs } from './config/envs';
     GroupsModule,
     StatsModule,
     BillingModule,
-    PaymentModule
+    PaymentModule,
+    Shedule
   ],
   controllers: [AppController],
   providers: [AppService],

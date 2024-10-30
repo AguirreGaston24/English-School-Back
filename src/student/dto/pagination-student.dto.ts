@@ -31,4 +31,8 @@ export class PaginationStudentDto {
   @IsOptional()
   @IsString()
   group?: string;
+
+  @IsOptional()
+  @IsString()
+  teacherId?: string;
 }

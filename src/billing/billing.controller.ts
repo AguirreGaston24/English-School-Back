@@ -22,6 +22,12 @@ export class BillingController {
     return this.billingService.findAll();
   }
 
+  @Get('amount-per-group')
+  async getAmountPerGroup() {
+      return await this.billingService.calculateAmountPerGroup();
+  }
+
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.billingService.findOne(id);

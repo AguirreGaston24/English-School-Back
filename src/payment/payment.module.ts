@@ -1,35 +1,24 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-
+import { TeacherModule } from 'src/teacher/teacher.module';
 import { PaymentService } from './payment.service';
 import { PaymentController } from './payment.controller';
-import { Students, StudentSchema } from 'src/student/entities/student.entity';
-import { Teacher, TeacherSchema } from 'src/teacher/entities/teacher.entity';
-import { Group, GroupSchema } from 'src/groups/entities/group.entity';
-import { Billing, BillingSchema } from 'src/billing/entities/billing.entity';
+import { Payment, PaymentSquema } from './entities/payment.entity';
+import { GroupsModule } from 'src/groups/groups.module'; 
+import { BillingModule } from '../billing/billing.module';
+import { StudentModule } from 'src/student/student.module'; // Importa el módulo de estudiantes
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: Students.name,
-        schema: StudentSchema
-      },
-      {
-        name: Teacher.name,
-        schema: TeacherSchema
-      },
-      {
-        name: Group.name,
-        schema: GroupSchema
-      },
-      {
-        name: Billing.name,
-        schema: BillingSchema
-      }
-    ]),
+    MongooseModule.forFeature([{ name: Payment.name, schema: PaymentSquema }]),
+    TeacherModule,
+    GroupsModule,
+    BillingModule,
+    StudentModule, // Importar el StudentModule
   ],
   controllers: [PaymentController],
-  providers: [PaymentService],
+  providers: [PaymentService], // Ya no necesitas StudentService aquí
+  exports: [PaymentService], // Ya no necesitas StudentService aquí
+
 })
-export class PaymentModule { }
+export class PaymentModule {}

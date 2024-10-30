@@ -24,14 +24,15 @@ export class BillingService {
       if (!student) {
         throw new NotFoundException(`Student with ID ${createBillingDto.student_id} not found`);
       }
-      
+  
       // Obtén el siguiente número de recibo
       const nextReceiptNumber = await this.getNextReceiptNumber();
   
-      // Crea el registro de facturación
+      // Define si 'debe' debe ser true o false en base al 'debe_amount'
       const billingRecord = new this.billingModel({
         ...createBillingDto,
-        receipt_number: nextReceiptNumber, // Asigna el número de recibo
+        receipt_number: nextReceiptNumber,
+        debe: !!createBillingDto.debe_amount, // Asigna 'true' si debe_amount tiene un valor numérico, 'false' si no
       });
   
       const savedBilling = await billingRecord.save();
@@ -54,6 +55,16 @@ export class BillingService {
     } catch (error) {
       console.log(error)
       throw new InternalServerErrorException('Error retrieving invoices');
+    }
+  }
+
+  async getBillingRecords(): Promise<Billing[]> {
+    try {
+      // Devuelve todos los registros de facturación
+      return await this.billingModel.find().exec();
+    } catch (error) {
+      console.error('Error al obtener los registros de facturación:', error);
+      throw new Error('Error al obtener los registros de facturación');
     }
   }
 
@@ -105,4 +116,34 @@ export class BillingService {
       throw new InternalServerErrorException('Error deleting invoice');
     }
   }
+
+  async calculateAmountPerGroup(): Promise<Record<string, number>> {
+    try {
+        // Consulta todos los registros de facturación
+        const billingRecords = await this.billingModel.find().exec();
+
+        // Crear un objeto para almacenar la suma de montos por grupo
+        const amountByGroup: Record<string, number> = {};
+
+        // Iterar sobre los registros y sumar los montos por grupo
+        billingRecords.forEach(record => {
+            const groupId = record.group_id; // Obtener el ID del grupo
+            const amount = record.amount; // Obtener el monto
+
+            if (!amountByGroup[groupId]) {
+                amountByGroup[groupId] = 0; // Inicializa si el grupo no existe
+            }
+
+            // Sumar el monto al grupo correspondiente
+            amountByGroup[groupId] += amount;
+        });
+
+        return amountByGroup; // Retorna el objeto con la suma por grupo
+    } catch (error) {
+        console.error('Error calculating amount per group:', error);
+        throw new InternalServerErrorException('Error calculating amount per group');
+    }
 }
+
+  }
+  

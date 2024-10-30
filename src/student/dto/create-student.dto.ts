@@ -13,6 +13,7 @@ export class CreateStudentDto {
   @IsString() school: string;
   @IsOptional() @IsString() group?: string;
   @IsOptional() @IsString() teacher?: string;
+  @IsOptional() @IsString() teacherId?: string;
   @IsOptional() @IsString() birth_date?: string;
   @IsString() tutor: string;
   @IsString() tutor_occupation: string;

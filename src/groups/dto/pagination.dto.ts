@@ -1,4 +1,5 @@
 import { IsOptional, IsString, IsIn, IsNumber } from 'class-validator';
+import { SortOrder } from 'mongoose';
 
 export class PaginationGroupDto {
   @IsOptional()
@@ -29,4 +30,5 @@ export class PaginationGroupDto {
   @IsOptional()
   @IsString()
   readonly teacher?: string;
+
 }
